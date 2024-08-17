@@ -1,0 +1,6 @@
+{
+  "appTitle": "image_search",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
