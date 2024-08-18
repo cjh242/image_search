@@ -13,8 +13,7 @@ class ImageDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Testing")),
       body: Center(
-        child: Image.network(
-            image.url), // Assuming link is a URL to the full image
+        child: Image.network(image.url),
       ),
     );
   }

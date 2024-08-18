@@ -53,22 +53,42 @@ class ImageSearchViewState extends State<ImageSearchView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Image Search'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48.0),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: 'Search for images...',
-                border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.search),
+        title: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search for images...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    fillColor: Colors.white,
+                    filled: true,
+                    prefixIcon: const Icon(Icons.search),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  ),
+                  onChanged: (value) => _onSearchChanged(),
+                ),
               ),
-              onChanged: (value) => _onSearchChanged(),
             ),
-          ),
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: () {
+                // Add your link action here
+                // You might want to use a package like url_launcher to open the link in a browser
+              },
+              child: Image.network(
+                'https://images.pexels.com/lib/api/pexels-white.png',
+                height: 40,
+              ),
+            ),
+          ],
         ),
+        backgroundColor: Colors.blue,
       ),
       body: Consumer<ImagesProvider>(
         builder: (context, imagesProvider, child) {
