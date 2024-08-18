@@ -1,68 +1,118 @@
+// screens/image_search_view.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/images_provider.dart'; // Assuming you have an ImageProvider
 
-import '../../settings_feature/settings_view.dart';
-import '../models/search_result.dart';
-import 'search_result_view.dart';
+class ImageSearchView extends StatefulWidget {
+  const ImageSearchView({super.key});
+  static const routeName = "/imageSearch";
 
-/// Displays a list of SampleItems.
-class SampleItemListView extends StatelessWidget {
-  const SampleItemListView({
-    super.key,
-    this.items = const [SampleItem(1), SampleItem(2), SampleItem(3)],
-  });
+  @override
+  ImageSearchViewState createState() => ImageSearchViewState();
+}
 
-  static const routeName = '/';
+class ImageSearchViewState extends State<ImageSearchView> {
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
-  final List<SampleItem> items;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    //check if timer is active
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    //start timer and fetch images
+    _debounce = Timer(const Duration(milliseconds: 1000), () {
+      final provider = Provider.of<ImagesProvider>(context, listen: false);
+      provider.resetSearch();
+      provider.fetchImages(query: _searchController.text);
+    });
+  }
+
+  void _fetchMoreImages(ImagesProvider imagesProvider) {
+    if (imagesProvider.hasMore && !imagesProvider.isLoading) {
+      imagesProvider.loadMoreImages();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sample Items'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // Navigate to the settings page. If the user leaves and returns
-              // to the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(context, SettingsView.routeName);
-            },
-          ),
-        ],
-      ),
-
-      // To work with lists that may contain a large number of items, it’s best
-      // to use the ListView.builder constructor.
-      //
-      // In contrast to the default ListView constructor, which requires
-      // building all Widgets up front, the ListView.builder constructor lazily
-      // builds Widgets as they’re scrolled into view.
-      body: ListView.builder(
-        // Providing a restorationId allows the ListView to restore the
-        // scroll position when a user leaves and returns to the app after it
-        // has been killed while running in the background.
-        restorationId: 'sampleItemListView',
-        itemCount: items.length,
-        itemBuilder: (BuildContext context, int index) {
-          final item = items[index];
-
-          return ListTile(
-              title: Text('SampleItem ${item.id}'),
-              leading: const CircleAvatar(
-                // Display the Flutter Logo image asset.
-                foregroundImage: AssetImage('assets/images/flutter_logo.png'),
+        title: const Text('Image Search'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                hintText: 'Search for images...',
+                border: OutlineInputBorder(),
+                suffixIcon: Icon(Icons.search),
               ),
-              onTap: () {
-                // Navigate to the details page. If the user leaves and returns to
-                // the app after it has been killed while running in the
-                // background, the navigation stack is restored.
-                Navigator.restorablePushNamed(
-                  context,
-                  SampleItemDetailsView.routeName,
-                );
-              });
+              onChanged: (value) => _onSearchChanged(),
+            ),
+          ),
+        ),
+      ),
+      body: Consumer<ImagesProvider>(
+        builder: (context, imagesProvider, child) {
+          if (imagesProvider.isLoading &&
+              imagesProvider.displayedImages.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (imagesProvider.displayedImages.isEmpty) {
+            return const Center(child: Text('No images found'));
+          } else {
+            return NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (scrollInfo.metrics.pixels ==
+                    scrollInfo.metrics.maxScrollExtent) {
+                  _fetchMoreImages(imagesProvider);
+                }
+                return true;
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // Number of columns in the grid
+                    crossAxisSpacing: 8.0, // Horizontal space between items
+                    mainAxisSpacing: 8.0, // Vertical space between items
+                    childAspectRatio: 1.0, // Aspect ratio for each item
+                  ),
+                  itemCount: imagesProvider.displayedImages.length +
+                      (imagesProvider.hasMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == imagesProvider.displayedImages.length) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    final image = imagesProvider.displayedImages[index];
+                    return ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(16.0), // Rounded corners
+                      child: Image.network(
+                        image.thumbnail,
+                        fit: BoxFit.cover, // Scale image to cover the container
+                      ),
+                    );
+                  },
+                ),
+              ),
+            );
+          }
         },
       ),
     );

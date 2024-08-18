@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:image_search/src/features/image_search_feature/models/images_results.dart';
 
-import 'features/image_search_feature/screens/search_result_view.dart';
+import 'features/image_search_feature/screens/image_view.dart';
 import 'features/image_search_feature/screens/image_search_view.dart';
 import 'features/settings_feature/settings_controller.dart';
 import 'features/settings_feature/settings_view.dart';
@@ -69,11 +70,11 @@ class MyApp extends StatelessWidget {
                 switch (routeSettings.name) {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
-                  case SampleItemDetailsView.routeName:
-                    return const SampleItemDetailsView();
-                  case SampleItemListView.routeName:
+                  // case ImageDetailScreen.routeName:
+                  //   return const ImageDetailScreen();
+                  case ImageSearchView.routeName:
                   default:
-                    return const SampleItemListView();
+                    return const ImageSearchView();
                 }
               },
             );
