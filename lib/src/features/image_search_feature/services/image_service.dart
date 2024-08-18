@@ -10,8 +10,10 @@ class ImageService {
 
   Future<List<ImagesResults>> fetchImagesFromApi(String query, int page) async {
     final url = Uri.parse(
+        //url with the query and the page
         'https://api.pexels.com/v1/search?query=$query&page=$page&per_page=80');
 
+    //add the apikey as a header
     final response = await http.get(
       url,
       headers: {
@@ -19,6 +21,7 @@ class ImageService {
       },
     );
 
+    //if the response is ookay decode it and map to our objects
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<ImagesResults> images = (data['photos'] as List)

@@ -1,13 +1,13 @@
 // screens/image_search_view.dart
 import 'dart:async';
-
+import 'package:image_search/src/features/image_search_feature/screens/image_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/images_provider.dart'; // Assuming you have an ImageProvider
+import '../providers/images_provider.dart';
 
 class ImageSearchView extends StatefulWidget {
   const ImageSearchView({super.key});
-  static const routeName = "/imageSearch";
 
   @override
   ImageSearchViewState createState() => ImageSearchViewState();
@@ -49,6 +49,15 @@ class ImageSearchViewState extends State<ImageSearchView> {
     }
   }
 
+  Future<void> _launchPexelsUrl() async {
+    final Uri url = Uri.parse('https://www.pexels.com');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,9 +87,9 @@ class ImageSearchViewState extends State<ImageSearchView> {
             const SizedBox(width: 8),
             InkWell(
               onTap: () {
-                // Add your link action here
-                // You might want to use a package like url_launcher to open the link in a browser
+                _launchPexelsUrl();
               },
+              //giving pexels credit as per thier api documentation
               child: Image.network(
                 'https://images.pexels.com/lib/api/pexels-white.png',
                 height: 40,
@@ -122,14 +131,24 @@ class ImageSearchViewState extends State<ImageSearchView> {
                       return const Center(child: CircularProgressIndicator());
                     }
                     final image = imagesProvider.displayedImages[index];
-                    return ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(16.0), // Rounded corners
-                      child: Image.network(
-                        image.url,
-                        fit: BoxFit.cover, // Scale image to cover the container
-                      ),
-                    );
+                    return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ImageDetailScreen(
+                                      image: image,
+                                    )),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(16.0), // Rounded corners
+                          child: Image.network(
+                            image.url,
+                            fit: BoxFit.cover,
+                          ),
+                        ));
                   },
                 ),
               ),

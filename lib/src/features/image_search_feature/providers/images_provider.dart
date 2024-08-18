@@ -24,13 +24,17 @@ class ImagesProvider extends ChangeNotifier {
     if (_isLoading) return;
 
     _isLoading = true;
+    //notify the page that we are loading
     notifyListeners();
 
     try {
+      //increase the page number
       _currentPage++;
+      //call the api
       final List<ImagesResults> newImages =
           await _imageService.fetchImagesFromApi(query, _currentPage);
 
+      //respond to the case where we dont get any images back
       if (newImages.isEmpty) {
         _hasMore = false;
       } else {
@@ -40,8 +44,10 @@ class ImagesProvider extends ChangeNotifier {
       }
     } catch (error) {
       _hasMore = false;
+      //logging the error here would be good
     } finally {
       _isLoading = false;
+      //notify the page of changes
       notifyListeners();
     }
   }
@@ -62,6 +68,7 @@ class ImagesProvider extends ChangeNotifier {
   }
 
   void loadMoreImages() {
+    //check to make sure there are more images to load and the page isnt currently loading
     if (_hasMore && !_isLoading) {
       _updateDisplayedImages();
       notifyListeners();
@@ -69,6 +76,7 @@ class ImagesProvider extends ChangeNotifier {
   }
 
   void resetSearch() {
+    //reset all the search fields
     _allImages.clear();
     _displayedImages.clear();
     _currentPage = 0;
