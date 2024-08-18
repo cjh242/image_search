@@ -13,9 +13,9 @@ void main() async {
 
   //in an a real app, this api key would never be in the code, even for one commit.
   //i just figured for the sake of you being apple to run it and it being a free key,
-  // i would just leave it here.
-  final imageService = ImageService(
-      "34cd24379f876d332c82c30ad54fadacbfa1452e35b68115bf7c63c4168850a5");
+  // i will just leave it here.
+  final imageService =
+      ImageService("jrx0Be8upzGn39wHkdu0fu0dq32IDst974CTdMNJl2hMIq5H0XAGhelr");
 
   // Load the user's preferred theme while the splash screen is displayed.
   // This prevents a sudden theme change when the app is first displayed.

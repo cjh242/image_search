@@ -21,7 +21,7 @@ class ImagesProvider extends ChangeNotifier {
   bool get hasMore => _hasMore;
 
   Future<void> fetchImages({required String query}) async {
-    if (_isLoading || !_hasMore) return;
+    if (_isLoading) return;
 
     _isLoading = true;
     notifyListeners();
@@ -35,6 +35,7 @@ class ImagesProvider extends ChangeNotifier {
         _hasMore = false;
       } else {
         _allImages.addAll(newImages);
+        _hasMore = true;
         _updateDisplayedImages();
       }
     } catch (error) {
@@ -53,6 +54,10 @@ class ImagesProvider extends ChangeNotifier {
           ? startIndex + _pageSize
           : _allImages.length;
       _displayedImages.addAll(_allImages.sublist(startIndex, endIndex));
+      //if there are less than 10 left, we will call the api again.
+      if (_displayedImages.length >= (_allImages.length - 10)) {
+        _hasMore = false;
+      }
     }
   }
 

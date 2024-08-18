@@ -44,6 +44,8 @@ class ImageSearchViewState extends State<ImageSearchView> {
   void _fetchMoreImages(ImagesProvider imagesProvider) {
     if (imagesProvider.hasMore && !imagesProvider.isLoading) {
       imagesProvider.loadMoreImages();
+    } else if (!imagesProvider.hasMore) {
+      imagesProvider.fetchImages(query: _searchController.text);
     }
   }
 
@@ -104,7 +106,7 @@ class ImageSearchViewState extends State<ImageSearchView> {
                       borderRadius:
                           BorderRadius.circular(16.0), // Rounded corners
                       child: Image.network(
-                        image.thumbnail,
+                        image.url,
                         fit: BoxFit.cover, // Scale image to cover the container
                       ),
                     );

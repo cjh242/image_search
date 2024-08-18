@@ -1,17 +1,17 @@
 /// A placeholder class that represents an entity or model.
 class ImagesResults {
   ImagesResults({
-    required this.position,
-    required this.thumbnail,
+    required this.id,
+    required this.url,
   });
 
-  final int position;
-  final String thumbnail;
+  final int id;
+  final String url;
 
   factory ImagesResults.fromJson(Map<String, dynamic> json) {
     return ImagesResults(
-      position: json['position'],
-      thumbnail: json['thumbnail'] ?? "",
+      id: json['id'],
+      url: json['src']?['medium'] ?? "",
     );
   }
 }
